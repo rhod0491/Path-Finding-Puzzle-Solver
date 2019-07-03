@@ -1,23 +1,18 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 public abstract class Algorithm {
 
     protected Node startNode;
-    protected Node goalNode;
+    protected Node goalNode = null;
     protected String goalDigits;
     protected ArrayList<String> forbiddenDigits;
-    protected Queue<Node> expandedNodes;
+    protected Queue<Node> validExploredNodes = new LinkedList<>();
+    protected int numExploredNodes = 1;
 
     public Algorithm(Node startNode, String goalDigits, ArrayList<String> forbiddenDigits) {
         this.startNode = startNode;
         this.goalDigits = goalDigits;
         this.forbiddenDigits = forbiddenDigits;
-
-        goalNode = null;
-        expandedNodes = new LinkedList<>();
     }
 
     public abstract void execute();
@@ -29,40 +24,32 @@ public abstract class Algorithm {
             return;
         }
 
-        Stack<String> shortestPath = new Stack<>();
+        ArrayList<String> shortestPathDigits = new ArrayList<>(goalNode.getDistanceFromRoot() + 1);
 
-        Node currNode = goalNode;
-        while (currNode.getParent() != null) {
-            shortestPath.push(currNode.getDigits());
-            currNode = currNode.getParent();
+        Node currentNode = goalNode;
+        while (currentNode.getParent() != null) {
+            shortestPathDigits.add(currentNode.getDigits());
+            currentNode = currentNode.getParent();
         }
+        shortestPathDigits.add(currentNode.getDigits());
 
-        shortestPath.push(currNode.getDigits());
+        Collections.reverse(shortestPathDigits);
 
-        while (!shortestPath.isEmpty()) {
-            String currentNode = shortestPath.pop();
-
-            if (shortestPath.isEmpty()) {
-                System.out.println(currentNode);
-            } else {
-                System.out.print(currentNode + ",");
-            }
-        }
+        String shortestPathString = String.join(",", shortestPathDigits);
+        System.out.println("Shortest path:\t" + shortestPathString);
 
     }
 
     public void printExploredNodes() {
 
-        while (!expandedNodes.isEmpty()) {
-            String currentNode = expandedNodes.poll().getDigits();
+        ArrayList<String> exploredNodeDigits = new ArrayList<>(validExploredNodes.size());
 
-            if (expandedNodes.isEmpty()) {
-                System.out.println(currentNode);
-            } else {
-                System.out.print(currentNode + ",");
-            }
-
+        for (Node node : validExploredNodes) {
+            exploredNodeDigits.add(node.getDigits());
         }
+
+        String exploredNodesString = String.join(",", exploredNodeDigits);
+        System.out.println("Explored nodes:\t" + exploredNodesString);
 
     }
 

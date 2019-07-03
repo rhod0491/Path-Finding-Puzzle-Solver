@@ -14,8 +14,7 @@ public class BreadthFirstSearch extends Algorithm {
         Queue<Node> fringeNodes = new LinkedList<>();
         fringeNodes.add(startNode);
 
-        int numNodesExpanded = 0;
-        while (!fringeNodes.isEmpty() && numNodesExpanded <= 1000) {
+        while (!fringeNodes.isEmpty() && numExploredNodes <= 1000) {
 
             Node currentNode = fringeNodes.poll();
 
@@ -23,15 +22,15 @@ public class BreadthFirstSearch extends Algorithm {
                 continue;
             } else if (currentNode.getDigits().equals(goalDigits)) {
                 goalNode = currentNode;
-                expandedNodes.add(currentNode);
+                validExploredNodes.add(currentNode);
                 break;
             }
 
             currentNode.generateChildren();
 
-            if (!expandedNodes.contains(currentNode)) {
-                expandedNodes.add(currentNode);
-                numNodesExpanded++;
+            if (!validExploredNodes.contains(currentNode)) {
+                validExploredNodes.add(currentNode);
+                numExploredNodes++;
                 fringeNodes.addAll(currentNode.getChildren());
             }
 

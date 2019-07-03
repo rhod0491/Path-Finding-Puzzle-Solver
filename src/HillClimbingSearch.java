@@ -10,10 +10,10 @@ public class HillClimbingSearch extends Algorithm {
 
     private Comparator<Node> comparator = (x, y) -> {
 
-        int manhattanDistanceDifference = x.getManhattanDistance() - y.getManhattanDistance();
+        int heuristicDifference = x.getHeuristic() - y.getHeuristic();
 
-        if (manhattanDistanceDifference != 0) {
-            return manhattanDistanceDifference;
+        if (heuristicDifference != 0) {
+            return heuristicDifference;
         } else {
             return -(x.getNodeId() - y.getNodeId());
         }
@@ -24,35 +24,34 @@ public class HillClimbingSearch extends Algorithm {
 
         PriorityQueue<Node> fringeNodes = new PriorityQueue<>(comparator);
 
-        int bestManhattanDistance = Integer.MAX_VALUE;
+        int bestHeuristic = Integer.MAX_VALUE;
         startNode.calculateHeuristic(goalDigits);
 
         fringeNodes.add(startNode);
 
-        int numNodesExpanded = 0;
-        while (!fringeNodes.isEmpty() && numNodesExpanded <= 1000) {
+        while (!fringeNodes.isEmpty() && numExploredNodes <= 1000) {
 
             Node currentNode = fringeNodes.poll();
 
-            if (forbiddenDigits.contains(currentNode.getDigits()) || currentNode.getManhattanDistance() >= bestManhattanDistance) {
+            if (forbiddenDigits.contains(currentNode.getDigits()) || currentNode.getHeuristic() >= bestHeuristic) {
                 continue;
             } else if (currentNode.getDigits().equals(goalDigits)) {
                 goalNode = currentNode;
-                expandedNodes.add(currentNode);
+                validExploredNodes.add(currentNode);
                 break;
             }
 
             currentNode.generateChildren();
             currentNode.calculateChildrenHeuristic(goalDigits);
 
-            if (!expandedNodes.contains(currentNode)) {
-                expandedNodes.add(currentNode);
-                numNodesExpanded++;
+            if (!validExploredNodes.contains(currentNode)) {
+                validExploredNodes.add(currentNode);
+                numExploredNodes++;
 
                 fringeNodes.clear();
                 fringeNodes.addAll(currentNode.getChildren());
 
-                bestManhattanDistance = currentNode.getManhattanDistance();
+                bestHeuristic = currentNode.getHeuristic();
             }
 
         }

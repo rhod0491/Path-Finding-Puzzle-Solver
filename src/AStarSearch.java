@@ -10,16 +10,17 @@ public class AStarSearch extends Algorithm {
 
     private Comparator<Node> comparator = (x, y) -> {
 
-        int xAStarHeuristic = x.getManhattanDistance() + x.getDistanceFromRoot();
-        int yAStarHeuristic = y.getManhattanDistance() + y.getDistanceFromRoot();
+        int xHeuristic = x.getHeuristic() + x.getDistanceFromRoot();
+        int yHeuristic = y.getHeuristic() + y.getDistanceFromRoot();
 
-        int AStarHeuristicDifference = xAStarHeuristic - yAStarHeuristic;
+        int heuristicDifference = xHeuristic - yHeuristic;
 
-        if (AStarHeuristicDifference != 0) {
-            return AStarHeuristicDifference;
+        if (heuristicDifference != 0) {
+            return heuristicDifference;
         } else {
             return -(x.getNodeId() - y.getNodeId());
         }
+
     };
 
     @Override
@@ -28,8 +29,7 @@ public class AStarSearch extends Algorithm {
         PriorityQueue<Node> fringeNodes = new PriorityQueue<>(comparator);
         fringeNodes.add(startNode);
 
-        int numNodesExpanded = 0;
-        while (!fringeNodes.isEmpty() && numNodesExpanded <= 1000) {
+        while (!fringeNodes.isEmpty() && numExploredNodes <= 1000) {
 
             Node currentNode = fringeNodes.poll();
 
@@ -37,16 +37,16 @@ public class AStarSearch extends Algorithm {
                 continue;
             } else if (currentNode.getDigits().equals(goalDigits)) {
                 goalNode = currentNode;
-                expandedNodes.add(currentNode);
+                validExploredNodes.add(currentNode);
                 break;
             }
 
             currentNode.generateChildren();
             currentNode.calculateChildrenHeuristic(goalDigits);
 
-            if (!expandedNodes.contains(currentNode)) {
-                expandedNodes.add(currentNode);
-                numNodesExpanded++;
+            if (!validExploredNodes.contains(currentNode)) {
+                validExploredNodes.add(currentNode);
+                numExploredNodes++;
                 fringeNodes.addAll(currentNode.getChildren());
             }
 

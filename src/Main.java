@@ -1,10 +1,8 @@
-import java.util.ArrayList;
+import java.util.*;
 import java.io.FileNotFoundException;
-import java.util.NoSuchElementException;
 import java.io.FileReader;
-import java.util.Scanner;
 
-public class ThreeDigits {
+public class Main {
 
 	public static void main(String[] args) {
 

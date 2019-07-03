@@ -1,30 +1,20 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.Objects;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class Node {
 
 	private static int idCounter = 0;
-	
-	private int nodeId;
+
+	private int nodeId = ++idCounter;
 	private Node parent;
 	private String digits;
-	private List<Node> children;
-	private int manhattanDistance;
 	private int distanceFromRoot;
+	private List<Node> children = new ArrayList<>();
+	private int heuristic = Integer.MAX_VALUE;
 
 	public Node(String digits, Node parent) {
-
-		++idCounter;
-		
-		nodeId = idCounter;
 		this.parent = parent;
 		this.digits = digits;
-		children = new ArrayList<>();
-		manhattanDistance = Integer.MAX_VALUE;
 
         distanceFromRoot = (this.parent == null) ? 0 : this.parent.getDistanceFromRoot() + 1;
 	}
@@ -43,30 +33,36 @@ public class Node {
 		return children;
 	}
 	
-	public int getManhattanDistance() {
-		return manhattanDistance;
+	public int getHeuristic() {
+		return heuristic;
 	}
 
 	public int getDistanceFromRoot() {
 		return distanceFromRoot;
 	}
-	
+
 	public void calculateHeuristic(String goal) {
-		
-		int goalHundreds = goal.charAt(0) - '0';
-		int goalTens = goal.charAt(1) - '0';
-		int goalOnes = goal.charAt(2) - '0';
-		
-		int currHundreds = digits.charAt(0) - '0';
-		int currTens = digits.charAt(1) - '0';
-		int currOnes = digits.charAt(2) - '0';
-		
-		manhattanDistance = Math.abs(goalHundreds - currHundreds) + Math.abs(goalTens - currTens) + Math.abs(goalOnes - currOnes);
+
+		if (digits.length() == 0 || digits.length() != goal.length()) {
+			return;
+		}
+
+		heuristic = 0;
+
+		for (int i = 0; i < digits.length(); i++) {
+
+			int nodeDigit = Character.getNumericValue(digits.charAt(i));
+			int goalDigit = Character.getNumericValue(goal.charAt(i));
+
+			heuristic += Math.abs(nodeDigit - goalDigit);
+
+		}
+
 	}
 
 	public void calculateChildrenHeuristic(String goal) {
-		for(Node node : children) {
-			node.calculateHeuristic(goal);
+		for(Node child : children) {
+			child.calculateHeuristic(goal);
 		}
 	}
 	
@@ -82,11 +78,11 @@ public class Node {
 
 		for (int i = 0; i < digits.length(); i++) {
 
-            String decrementedNodeDigit = decrementDigit(i);
-            childDigits.add(decrementedNodeDigit);
+            String decrementedNodeDigits = decrementDigit(i);
+            childDigits.add(decrementedNodeDigits);
 
-            String incrementedNodeDigit = incrementDigit(i);
-            childDigits.add(incrementedNodeDigit);
+            String incrementedNodeDigits = incrementDigit(i);
+            childDigits.add(incrementedNodeDigits);
 
         }
 
@@ -95,6 +91,19 @@ public class Node {
 		for (String child : childDigits) {
             children.add(new Node(child, this));
         }
+
+	}
+
+	private String decrementDigit(int index) {
+
+		char digit = digits.charAt(index);
+
+		boolean prevDigitShifted = (parent != null && parent.getDigits().charAt(index) != digit);
+		if (digit != '0' && !prevDigitShifted) {
+			return digits.substring(0, index) + (digit -= 1) + digits.substring(index + 1);
+		}
+
+		return digits;
 
 	}
 
@@ -111,21 +120,25 @@ public class Node {
 
     }
 
-    private String decrementDigit(int index) {
+    public List<String> getChildDigits() {
 
-        char digit = digits.charAt(index);
+		List<String> childDigits = new ArrayList<>(children.size());
 
-        boolean prevDigitShifted = (parent != null && parent.getDigits().charAt(index) != digit);
-        if (digit != '0' && !prevDigitShifted) {
-            return digits.substring(0, index) + (digit -= 1) + digits.substring(index + 1);
-        }
+		for (Node child : children) {
+			childDigits.add(child.getDigits());
+		}
 
-        return digits;
+		return childDigits;
 
-    }
+	}
 
 	@Override
 	public String toString() {
+
+		String parentDigits = "null";
+		if (parent != null) {
+			parentDigits = parent.getDigits();
+		}
 
         List<String> childrenList = new ArrayList<>(children.size());
         for (Node child : children) {
@@ -136,10 +149,10 @@ public class Node {
 
 		return "Node{" +
 				"nodeId=" + nodeId +
-				", parent=" + parent +
+				", parent=" + parentDigits +
 				", digits='" + digits + '\'' +
                 ", children=[" + childrenDigits + "]" +
-				", manhattanDistance=" + manhattanDistance +
+				", heuristic=" + heuristic +
 				", distanceFromRoot=" + distanceFromRoot +
 				'}';
 	}
@@ -149,7 +162,7 @@ public class Node {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Node node = (Node) o;
-		return digits.equals(node.digits) && Objects.equals(children, node.children);
+		return digits.equals(node.digits) && Objects.equals(getChildDigits(), node.getChildDigits());
 	}
 
 	@Override

@@ -5,25 +5,21 @@ import java.util.Stack;
 
 public class IterativeDeepeningSearch extends Algorithm {
 
-    private int maxDepth;
-
-    public IterativeDeepeningSearch(Node startNode, String goalDigits, ArrayList<String> forbiddenDigits, int maxDepth) {
+    public IterativeDeepeningSearch(Node startNode, String goalDigits, ArrayList<String> forbiddenDigits) {
         super(startNode, goalDigits, forbiddenDigits);
-        this.maxDepth = maxDepth;
     }
 
     @Override
     public void execute() {
 
-        int numNodesExpanded = 0;
-        for (int currentDepth = 0; currentDepth <= maxDepth; currentDepth++) {
+        for (int currentDepth = 0; currentDepth <= 1000; currentDepth++) {
 
             Stack<Node> fringeNodes = new Stack<>();
             fringeNodes.push(startNode);
 
             Queue<Node> expandedNodesCurrentDepth = new LinkedList<>();
 
-            while (!fringeNodes.isEmpty() && numNodesExpanded <= 1000) {
+            while (!fringeNodes.isEmpty() && numExploredNodes <= 1000) {
 
                 Node currentNode = fringeNodes.pop();
 
@@ -40,12 +36,12 @@ public class IterativeDeepeningSearch extends Algorithm {
 
                 if (!expandedNodesCurrentDepth.contains(currentNode)) {
                     expandedNodesCurrentDepth.add(currentNode);
-                    numNodesExpanded++;
+                    numExploredNodes++;
                     fringeNodes.addAll(currentNode.getChildren());
                 }
             }
 
-            expandedNodes.addAll(expandedNodesCurrentDepth);
+            validExploredNodes.addAll(expandedNodesCurrentDepth);
 
             if (goalNode != null) {
                 break;
