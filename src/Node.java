@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Node {
@@ -50,12 +49,10 @@ public class Node {
 		heuristic = 0;
 
 		for (int i = 0; i < digits.length(); i++) {
-
 			int nodeDigit = Character.getNumericValue(digits.charAt(i));
 			int goalDigit = Character.getNumericValue(goal.charAt(i));
 
 			heuristic += Math.abs(nodeDigit - goalDigit);
-
 		}
 
 	}
@@ -120,7 +117,8 @@ public class Node {
 
     }
 
-    public List<String> getChildDigits() {
+    // used to compare the child digits when overriding equals
+    private List<String> getChildDigits() {
 
 		List<String> childDigits = new ArrayList<>(children.size());
 
