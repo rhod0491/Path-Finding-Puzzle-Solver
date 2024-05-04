@@ -1,4 +1,4 @@
-# Search Algorithms
+# Path Finding Puzzle Solver
 
 This application allows you to see the efficiencies and strategies used
 by various searching algorithms by completing a 3-digit puzzle.
